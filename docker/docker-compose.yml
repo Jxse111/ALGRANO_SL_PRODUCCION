@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # El contenedor de MySQL se basa en la imagen oficial de MySQL
@@ -6,7 +6,7 @@ services:
     image: mysql:8
     container_name: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: root  # Contraseña para el usuario root
+      MYSQL_ROOT_PASSWORD: root # Contraseña para el usuario root
       MYSQL_DATABASE: algrano
       MYSQL_USER: empleadodb
       MYSQL_PASSWORD: algranodb
@@ -36,45 +36,15 @@ services:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
     environment:
-      PMA_HOST: mysql  # Conectamos a MySQL a través del nombre del contenedor 'mysql'
-      MYSQL_ROOT_PASSWORD: root  # La misma contraseña para el usuario root de MySQL
+      PMA_HOST: mysql # Conectamos a MySQL a través del nombre del contenedor 'mysql'
+      MYSQL_ROOT_PASSWORD: root # La misma contraseña para el usuario root de MySQL
     ports:
-      - "8081:80"  # Accedemos a phpMyAdmin desde http://localhost:8081
+      - "8081:80" # Accedemos a phpMyAdmin desde http://localhost:8081
     networks:
       - app-network
     depends_on:
       - mysql
-
-  # El contenedor de Tailscale se basa en la imagen oficial de Tailscale
-  # Este contenedor se conecta a la red de Tailscale y permite el acceso a los servicios
-  # a través de la red privada de Tailscale
-  # Se utiliza para acceder a los servicios de la aplicación de forma segura
-  tailscale-nginx:
-    image: tailscale/tailscale:latest
-    hostname: tailscale-nginx
-    environment:
-      - TS_AUTHKEY=tskey-client-notAReal-OAuthClientSecret1Atawk
-      - TS_EXTRA_ARGS=--advertise-tags=tag:container
-      - TS_STATE_DIR=/var/lib/tailscale
-      - TS_USERSPACE=false
-    volumes:
-      - ./tailscale-nginx/state:/var/lib/tailscale
-    devices:
-      - /dev/net/tun:/dev/net/tun
-    cap_add:
-      - net_admin
-    restart: unless-stopped
-
-  # El contenedor de Nginx se basa en la imagen oficial de Nginx
-  # Este contenedor se utiliza como proxy inverso para enrutar el tráfico a los servicios
-  # de la aplicación a través de la red privada de Tailscale
-  nginx:
-    image: nginx
-    depends_on:
-      - tailscale-nginx
-    networks:
-      - app-network
-
+# Definimos una red para que los contenedores puedan comunicarse entre sí
 networks:
   app-network:
     driver: bridge
