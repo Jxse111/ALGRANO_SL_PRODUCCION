@@ -81,6 +81,7 @@ const IVA = 1.21;
                         <th>Cantidad</th>
                         <th>Precio</th>
                         <th>Total</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -104,24 +105,57 @@ const IVA = 1.21;
                                         <td><?= htmlspecialchars($cantidad) ?></td>
                                         <td><?= number_format($productoCesta['precio_ud'], 2) ?> €</td>
                                         <td><?= number_format($subtotal, 2) ?> €</td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmarEliminacion(<?= $i ?>)">
+                                                <i class="fas fa-trash"></i> Eliminar
+                                            </button>
+
+                                            <script>
+                                            function confirmarEliminacion(indice) {
+                                                if (confirm('¿Está seguro de que desea eliminar este producto de la cesta?')) {
+                                                    eliminarProducto(indice);
+                                                }
+                                            }
+
+                                            function eliminarProducto(indice) {
+                                                fetch('carrito.php?eliminar=' + indice)
+                                                    .then(() => {
+                                                        window.location.reload();
+                                                    });
+                                            }
+                                            </script>
+                                            <?php
+                                            if (isset($_GET['eliminar'])) {
+                                                $indice = $_GET['eliminar'];
+                                                if (isset($_SESSION['cesta'][$indice])) {
+                                                    array_splice($_SESSION['cesta'], $indice, 1);
+                                                    array_splice($_SESSION['cantidad'], $indice, 1);
+                                                    if (isset($_SESSION['subtotales'])) {
+                                                        array_splice($_SESSION['subtotales'], $indice, 1);
+                                                    }
+                                                }
+                                                exit();
+                                            }
+                                            ?>
+                                        </td>
                                     </tr>
-                <?php
+                    <?php
                                 }
                             }
                         }
-                    }
-                }
-                ?>
-                <tr>
-                    <td colspan="3" class="text-right font-weight-bold">Total + IVA</td>
-                    <td><?= number_format($total, 2)+IVA ?> €</td>
-                </tr>
+                    } ?>
+                    <tr>
+                        <td colspan="4" class="text-right font-weight-bold">Total + IVA</td>
+                        <td><?= number_format($total * IVA, 2) ?> €</td>
+                    </tr>
                 </tbody>
             </table>
             <form action="../Vista/pago.php" method="post">
                 <input type="hidden" name="total" value="<?= $total ?>">
                 <button type="submit" class="btn btn-primary">Realizar compra</button>
             </form>
+        <?php
+        } ?>
     </div>
     <!-- Fin del carrito -->
     <!-- Footer -->

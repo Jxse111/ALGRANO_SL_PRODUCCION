@@ -21,10 +21,29 @@ if (filter_has_var(INPUT_POST, 'comprar')) {
         // Product not in cart, add it
         $_SESSION["cesta"][] = $producto_id;
         $_SESSION["cantidad"][] = $cantidad;
-        echo "<script>alert('Producto añadido al carrito');</script>";
+        echo '<div class="alert alert-success alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999;">
+            <i class="fas fa-check-circle mr-2"></i>¡Producto agregado exitosamente al carrito!
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+            </div>';
+        echo '<script>
+            setTimeout(function(){
+            $(".alert").fadeOut("slow");
+            }, 3000);
+        </script>';
     } else {
-        echo "<script>alert('Este producto ya está en el carrito');</script>";
-    }
+        echo '<div class="alert alert-danger alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999;">
+            <i class="fas fa-exclamation-circle mr-2"></i>¡El producto seleccionado ya ha sido agregado al carrito!
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+            </div>';
+        echo '<script>
+            setTimeout(function(){
+            $(".alert").fadeOut("slow");
+            }, 3000);
+        </script>';    }
 }
 ?>
 <!DOCTYPE html>
@@ -151,10 +170,11 @@ if (filter_has_var(INPUT_POST, 'comprar')) {
                                         <div class="mb-4">
                                             <strong>Origen:</strong> <?php echo $productoDetalle['origen']; ?><br>
                                             <strong>Tipo:</strong> <?php echo $productoDetalle['tipo']; ?><br>
-                                            <strong>Stock:</strong> <?php echo $productoDetalle['stock']; ?> unidades
+                                            <strong>Stock:</strong> <?php echo $productoDetalle['stock']; ?> unidades <br>
+                                            <strong>Cantidad:</strong> 1 Kg/Unidad
                                         </div>
                                         <?php if ($_SESSION['rol'] == 'cliente' || $_SESSION['rol'] == 'administrador') { ?>
-                                            <form action="" method="POST">
+                                            <form id="cartForm" action="" method="POST">
                                                 <input type="hidden" name="producto_id" value="<?php echo $productoId; ?>">
                                                 <?php if ($productoDetalle['stock'] > 1) { ?>
                                                     <div class="form-group">
